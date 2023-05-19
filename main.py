@@ -4,8 +4,6 @@ from langchain.prompts import SystemMessagePromptTemplate, ChatPromptTemplate
 
 from promts import PREFIX
 
-load_dotenv()
-
 
 def main():
     file_path = __file__
@@ -25,4 +23,5 @@ def main():
 
 
 if __name__ == '__main__':
+    load_dotenv()
     main()
