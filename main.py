@@ -1,78 +1,62 @@
-import os
-from typing import List
 from dotenv import load_dotenv
+from langchain import PromptTemplate
+from langchain.agents import initialize_agent, load_tools, AgentType
 from langchain.chat_models import ChatOpenAI
-from langchain.prompts import SystemMessagePromptTemplate, ChatPromptTemplate
-from promts import PREFIX
+
+from langchain_extension.tools_only_agent_with_thoughts.output_parser import ToolsOnlyWithThoughtsOutputParser
+from promts import CODER_PREFIX, REVIEWER_PREFIX
+from tools import SendToReviewTool, ReviewTool, ApproveTool
 
 
-def load_model(model_name: str, temperature: int) -> ChatOpenAI:
-    """
-    Load OpenAI GPT model.
+def update_code(code: str, task: str) -> str:
+    llm = ChatOpenAI(model_name="gpt-4", temperature=0)
+    send_to_review_tool = SendToReviewTool()
+    coder_tools = load_tools(["requests_get"]) + [send_to_review_tool]
+    coder_agent = initialize_agent(
+        tools=coder_tools,
+        llm=llm,
+        verbose=True,
+        agent=AgentType.CHAT_CONVERSATIONAL_REACT_DESCRIPTION,
+        max_iterations=3,
+        agent_kwargs={
+            "system_message": PromptTemplate.from_template(CODER_PREFIX).format_prompt(task=task).to_string(),
+            "output_parser": ToolsOnlyWithThoughtsOutputParser()}
+    )
 
-    Args:
-        model_name: String specifying the model to be used.
-        temperature: Integer specifying the temperature to be used.
+    review_tool = ReviewTool()
+    approve_tool = ApproveTool()
+    reviewer_agent = initialize_agent(
+        tools=[review_tool, approve_tool],
+        llm=llm,
+        verbose=True,
+        agent=AgentType.CHAT_CONVERSATIONAL_REACT_DESCRIPTION,
+        agent_kwargs={
+            "system_message": PromptTemplate.from_template(REVIEWER_PREFIX).format_prompt(task=task).to_string(),
+            "output_parser": ToolsOnlyWithThoughtsOutputParser(final_tools={review_tool.name})}
+    )
 
-    Returns:
-        An instance of ChatOpenAI model.
-    """
-    return ChatOpenAI(model_name=model_name, temperature=temperature)
+    send_to_review_tool.reviewer = reviewer_agent
+    review_tool.coder = coder_agent
+
+    coder_agent.run(input=code, chat_history=[], task=task)
+    return send_to_review_tool.last_answer
 
 
 def read_file(file_path: str) -> str:
-    """
-    Read a file and return its content.
-
-    Args:
-        file_path: String specifying the path of the file.
-
-    Returns:
-        A string containing the content of the file.
-    """
     with open(file_path, 'r') as file:
         return file.read()
 
 
 def write_file(file_path: str, updated_code: str) -> None:
-    """
-    Write updated code to a file.
-
-    Args:
-        file_path: String specifying the path of the file.
-        updated_code: String specifying the updated code.
-
-    Returns:
-        None
-    """
     with open(file_path, 'w') as file:
         file.write(updated_code)
 
 
-def create_chat_template() -> ChatPromptTemplate:
-    """
-    Create a chat template.
-
-    Returns:
-        An instance of ChatPromptTemplate.
-    """
-    return ChatPromptTemplate.from_messages([
-        SystemMessagePromptTemplate.from_template(PREFIX)
-    ])
-
-
 def main():
-    """
-    Main function to update the code.
-    """
     file_path = __file__
     task = input("Enter task: ")
-
-    llm = load_model(model_name="gpt-4", temperature=0)
-    chat_template = create_chat_template()
     code = read_file(file_path=file_path)
-
-    updated_code = llm(chat_template.format_prompt(task=task, code=code).to_messages()).content
+    updated_code = update_code(code=code, task=task)
     write_file(file_path=file_path, updated_code=updated_code)
 
 
