@@ -15,5 +15,5 @@ class ToolsOnlyWithThoughtsOutputParser(ConvoOutputParser):
     def parse(self, text: str) -> Union[AgentAction, AgentFinish]:
         action: AgentAction = super().parse(text)
         if action.tool in self.final_tools:
-            return AgentFinish({"output": action.tool_input}, text)
+            return AgentFinish({"output": action.tool_input, "tool_name": action.tool}, text)
         return action

@@ -1,0 +1,17 @@
+Style guidelines:
+Follow flake8 style guide.
+All function should have both input and output type hints.
+Internal function variables should not have type hints.
+If it is not clear from function name and type hints, what the function does, add a short docstring.
+Simple function with clear name and arguments should not have docstring.
+Do not use obvious docstrings, add arguments to docstring only if they are not clear from type hints and name.
+Docstrings should explain what the function does, not how it does it.
+
+Architecture guidelines:
+Avoid using global variables and package-level variables.
+Avoid using computations on package level.
+Follow the best development practices, such as single responsibility principle, etc.
+Functions should be short and do only one thing.
+When extending functionality, make sure that the old functionality not changed.
+For example, when adding new argument to function, use default value for it, saving old behaviour when used without new argument.
+Avoid implementing functionality that exist in well-known libraries.
