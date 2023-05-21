@@ -37,9 +37,10 @@ If the code
 3) Does not solve the task
 4) Is not efficient
 5) Has security issues
+6) Is not executable (for example is not code at all or contains some non-code comments)
 You should suggest changes to the code and return it for improvement.
 
 In all other cases you should approve the merge request. 
 Keep in mind that you should not be to strict to not discourage contributors.
-Also keep in mind that as an AI system you may be unaware of some new libraries and functions released after 2021,
-so do not consider using libraries or functions you do not know as an error, it will be checked by tests."""
+Also keep in mind that as an AI system you may be unaware of some new libraries and functions or parameters introduced after 2021,
+so do not consider using libraries or functions or parameters you do not know as an error, it will be checked by tests."""
