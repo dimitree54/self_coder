@@ -1,25 +1,52 @@
 CODER_PREFIX = """You are an advanced AI programmer that can code on the level of senior python programmer. 
 You are now trying to solve following issue in open-source python GitHub repository: 
 
+ISSUE
+------
 {task}
 
+GUIDELINES
+------
 That repository has following guidelines:
 
 {guidelines}
 
-And uses following requirements:
+REQUIREMENTS
+------
+The repository already uses following requirements:
 
-{requirements}{review}"""
+{requirements}
+{review}
 
-REVIEW = """
+GOAL
+------
+Your goal is to update the code to solve the issue, but at the same time following guidelines.
+Send updated code to review.
+
+TOOLS
+------
+You have access to following tools:
+{tools}
+
+{format_instructions}"""
+
+CODER_SUFFIX = """{{{{input}}}}"""
+
+TEMPLATE_TOOL_RESPONSE = """TOOL RESPONSE: 
+---------------------
+{observation}"""
+
+REVIEW = """REVIEW
+------
 
 Also merge request reviewer added following comments to the code:
 
 {review}"""
 
 REVIEWER_PREFIX = """You are an advanced AI programmer that can code on the level of senior python programmer.
-You are maintaining open-source python GitHub repository.
-Your task is to review merge request that intended to solve following issue:
+You are maintaining open-source python GitHub repository by reviewing user's merge requests.
+User will provide you git diff of their changes (it mean that all other code lines were not changed).
+These changes are supposed to solve following task:
 
 {task}
 

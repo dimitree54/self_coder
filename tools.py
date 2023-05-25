@@ -1,3 +1,5 @@
+from typing import List
+
 from langchain.tools import BaseTool
 
 
@@ -14,7 +16,8 @@ class FinalAnswerTool(BaseTool):
 class SendToReviewTool(FinalAnswerTool):
     name: str = "send_to_review"
     description: str = "When you ready to generate requested code, use that tool to send code to review. " \
-                       "The input of that tool should be your code without any additional text. " \
+                       "The input of that tool is your updated code without any additional text. " \
+                       "Code should include whole updated file, including not changed lines. " \
                        "The code have to be executable, so do not include any non-code text."
 
 
@@ -30,3 +33,13 @@ class ApproveTool(FinalAnswerTool):
     description: str = "If you are satisfied with code, use that tool to approve it. " \
                        "The input of that tool is your comments about code."
     return_direct: bool = True
+
+
+def format_tools_description(tools: List[BaseTool]) -> str:
+    return "\n".join(
+        [f"> {tool.name}: {tool.description}" for tool in tools]
+    )
+
+
+def format_tool_names(tools: List[BaseTool]) -> str:
+    return ", ".join([tool.name for tool in tools])
