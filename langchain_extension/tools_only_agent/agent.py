@@ -7,9 +7,9 @@ from langchain.chat_models import ChatOpenAI
 from pydantic import BaseModel
 
 from langchain_extension.tools_only_agent.output_parser import ToolsOnlyOutputParser
-from langchain_extension.tools_only_agent.utils import ToolType, SmartTool, ExtraThought
+from langchain_extension.tools_only_agent.utils import ToolType, SmartTool, ExtraThought, format_tool_names, \
+    format_tools_description
 from langchain_extension.tools_only_agent.prompt import TEMPLATE_TOOL_RESPONSE, TOOLS_AND_FORMAT, SUFFIX
-from tools import format_tools_description, format_tool_names
 
 
 class Agent(BaseModel):

@@ -1,16 +1,4 @@
-from typing import List
-
-from langchain.tools import BaseTool
-
-
-class FinalAnswerTool(BaseTool):
-    """Tool for direct returning its arguments from agent (use it as final_tool in ToolsOnlyOutputParser)"""
-
-    def _run(self, tool_input: str) -> str:
-        raise RuntimeError("That tool supposed to be final. Add it as final_tool in ToolsOnlyOutputParser.")
-
-    async def _arun(self, tool_input: str) -> str:
-        raise RuntimeError("That tool supposed to be final. Add it as final_tool in ToolsOnlyOutputParser.")
+from langchain_extension.tools_only_agent.utils import FinalAnswerTool
 
 
 class SendToReviewTool(FinalAnswerTool):
@@ -35,11 +23,3 @@ class ApproveTool(FinalAnswerTool):
     return_direct: bool = True
 
 
-def format_tools_description(tools: List[BaseTool]) -> str:
-    return "\n".join(
-        [f"> {tool.name}: {tool.description}" for tool in tools]
-    )
-
-
-def format_tool_names(tools: List[BaseTool]) -> str:
-    return ", ".join([tool.name for tool in tools])
