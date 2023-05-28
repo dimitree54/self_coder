@@ -4,13 +4,13 @@ from langchain.tools import BaseTool
 
 
 class FinalAnswerTool(BaseTool):
-    """Tool for direct returning its arguments from agent (use it as final_tool in ToolsOnlyWithThoughtsOutputParser)"""
+    """Tool for direct returning its arguments from agent (use it as final_tool in ToolsOnlyOutputParser)"""
 
     def _run(self, tool_input: str) -> str:
-        raise RuntimeError("That tool supposed to be final. Add it as final_tool in ToolsOnlyWithThoughtsOutputParser.")
+        raise RuntimeError("That tool supposed to be final. Add it as final_tool in ToolsOnlyOutputParser.")
 
     async def _arun(self, tool_input: str) -> str:
-        raise RuntimeError("That tool supposed to be final. Add it as final_tool in ToolsOnlyWithThoughtsOutputParser.")
+        raise RuntimeError("That tool supposed to be final. Add it as final_tool in ToolsOnlyOutputParser.")
 
 
 class SendToReviewTool(FinalAnswerTool):
