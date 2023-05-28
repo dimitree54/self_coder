@@ -4,8 +4,8 @@ from langchain import PromptTemplate
 from langchain.agents.conversational_chat.output_parser import ConvoOutputParser
 from langchain.schema import AgentAction, AgentFinish
 
-from langchain_extension.utils import ExtraThought
-from langchain_extension.tools_only_agent_with_thoughts.prompt import FORMAT_INSTRUCTIONS
+from langchain_extension.tools_only_agent.utils import ExtraThought
+from langchain_extension.tools_only_agent.prompt import FORMAT_INSTRUCTIONS
 
 
 class ToolsOnlyOutputParser(ConvoOutputParser):

@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Any
 
 from langchain import PromptTemplate
 from langchain.agents import initialize_agent, AgentType
@@ -6,9 +6,9 @@ from langchain.chat_models import ChatOpenAI
 
 from pydantic import BaseModel
 
-from langchain_extension.tools_only_agent_with_thoughts.output_parser import ToolsOnlyOutputParser
-from langchain_extension.utils import ToolType, SmartTool, ExtraThought
-from langchain_extension.prompts import TEMPLATE_TOOL_RESPONSE, TOOLS_AND_FORMAT, SUFFIX
+from langchain_extension.tools_only_agent.output_parser import ToolsOnlyOutputParser
+from langchain_extension.tools_only_agent.utils import ToolType, SmartTool, ExtraThought
+from langchain_extension.tools_only_agent.prompt import TEMPLATE_TOOL_RESPONSE, TOOLS_AND_FORMAT, SUFFIX
 from tools import format_tools_description, format_tool_names
 
 
@@ -19,7 +19,8 @@ class Agent(BaseModel):
     tools: List[SmartTool] = []
     verbose: bool = False
 
-    def call(self, **kwargs) -> str:
+    def call(self, **kwargs) -> dict[str, Any]:
+        # we initialize new agent every call to support dynamically changing tools
         output_parser = ToolsOnlyOutputParser(
             final_tools=set([tool.tool.name for tool in self.tools if tool.tool_type == ToolType.FINAL]),
             extra_thoughts=self.extra_thoughts
@@ -44,7 +45,7 @@ class Agent(BaseModel):
                 "output_parser": output_parser
             }
         )
-        return agent(kwargs)["output"]
+        return agent(kwargs)
 
     @staticmethod
     def _format_prompt(prompt: PromptTemplate, **kwargs) -> str:

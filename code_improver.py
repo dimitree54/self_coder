@@ -1,8 +1,8 @@
 from langchain import PromptTemplate
 from langchain.chat_models import ChatOpenAI
 
-from langchain_extension.agent import Agent
-from langchain_extension.utils import ToolType, SmartTool, ExtraThought
+from langchain_extension.tools_only_agent.agent import Agent
+from langchain_extension.tools_only_agent.utils import ToolType, SmartTool, ExtraThought
 from promts import REVIEW, CODER_PREFIX
 from tools import SendToReviewTool
 from utils import IssueInfo
@@ -34,4 +34,4 @@ def improve_code(llm: ChatOpenAI, code_to_improve: str, issue_info: IssueInfo, r
         chat_history=[],
         task=issue_info.task, guidelines=issue_info.guidelines,
         requirements=issue_info.requirements, review=review
-    )
+    )["output"]

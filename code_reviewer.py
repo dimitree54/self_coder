@@ -2,30 +2,45 @@ import difflib
 from typing import Optional
 
 from langchain import PromptTemplate
-from langchain.agents import initialize_agent, AgentType
 from langchain.chat_models import ChatOpenAI
 
-from langchain_extension.tools_only_agent_with_thoughts.output_parser import ToolsOnlyOutputParser
-from utils import IssueInfo
+from langchain_extension.tools_only_agent.agent import Agent
+from langchain_extension.tools_only_agent.utils import ExtraThought, ToolType, SmartTool
 from promts import REVIEWER_PREFIX
 from tools import ReviewTool, ApproveTool
+from utils import IssueInfo
 
 
 def review_code(llm: ChatOpenAI, code_diff: str, issue_info: IssueInfo) -> Optional[str]:
     review_tool = ReviewTool()
     approve_tool = ApproveTool()
-    reviewer_instructions = PromptTemplate.from_template(REVIEWER_PREFIX).format_prompt(
-        task=issue_info.task, guidelines=issue_info.guidelines, requirements=issue_info.requirements).to_string()
-
-    reviewer_output = initialize_agent(
-        tools=[review_tool, approve_tool],
+    code_reviewer = Agent(
         llm=llm,
-        verbose=True,
-        agent=AgentType.CHAT_CONVERSATIONAL_REACT_DESCRIPTION,
-        agent_kwargs={
-            "system_message": reviewer_instructions,
-            "output_parser": ToolsOnlyOutputParser(final_tools={review_tool.name, approve_tool.name})}
-    )(dict(input=code_diff, chat_history=[]))
+        system_message=PromptTemplate.from_template(REVIEWER_PREFIX),
+        extra_thoughts=[
+            ExtraThought(
+                name="first_thought",
+                description="What is the best way to solve the task? What action to take with what action_input?"),
+            ExtraThought(
+                name="criticism",
+                description="Constructive criticism of the first_thought, considering an alternative options"),
+            ExtraThought(
+                name="final_thought",
+                description="Final reasoning, what action and action_input to choose and why"),
+        ],
+        tools=[
+            SmartTool(tool=review_tool, tool_type=ToolType.FINAL),
+            SmartTool(tool=approve_tool, tool_type=ToolType.FINAL)
+        ],
+        verbose=True
+    )
+    reviewer_output = code_reviewer.call(
+        input=code_diff,
+        chat_history=[],
+        task=issue_info.task, guidelines=issue_info.guidelines,
+        requirements=issue_info.requirements
+    )
+
     if reviewer_output["tool_name"] == review_tool.name:
         return reviewer_output["output"]
     elif reviewer_output["tool_name"] == approve_tool.name:
