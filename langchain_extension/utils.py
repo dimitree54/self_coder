@@ -1,4 +1,8 @@
 import re
+from enum import Enum
+
+from langchain.tools import BaseTool
+from pydantic import BaseModel
 
 
 def extract_code(input_string):
@@ -14,3 +18,19 @@ def extract_code(input_string):
         code = input_string
 
     return code
+
+
+class ToolType(Enum):
+    RETURNING = "returning"
+    FINAL = "final"
+    DELEGATE = "delegate"
+
+
+class SmartTool(BaseModel):
+    tool: BaseTool
+    tool_type: ToolType = ToolType.RETURNING
+
+
+class ExtraThought(BaseModel):
+    name: str
+    description: str

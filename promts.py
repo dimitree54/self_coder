@@ -15,26 +15,12 @@ REQUIREMENTS
 ------
 The repository already uses following requirements:
 
-{requirements}
-{review}
+{requirements}{review}
 
 GOAL
 ------
 Your goal is to update the code to solve the issue, but at the same time following guidelines.
-Send updated code to review.
-
-TOOLS
-------
-You have access to following tools:
-{tools}
-
-{format_instructions}"""
-
-CODER_SUFFIX = """{{{{input}}}}"""
-
-TEMPLATE_TOOL_RESPONSE = """TOOL RESPONSE: 
----------------------
-{observation}"""
+Send updated code to review."""
 
 REVIEW = """REVIEW
 ------

@@ -1,21 +1,22 @@
-from typing import Union, Set, Tuple, List
+from typing import Union, Set, List
 
 from langchain import PromptTemplate
 from langchain.agents.conversational_chat.output_parser import ConvoOutputParser
 from langchain.schema import AgentAction, AgentFinish
 
+from langchain_extension.utils import ExtraThought
 from langchain_extension.tools_only_agent_with_thoughts.prompt import FORMAT_INSTRUCTIONS
 
 
 class ToolsOnlyOutputParser(ConvoOutputParser):
     final_tools: Set[str] = set()
-    extra_thoughts: List[Tuple[str, str, str]] = []
+    extra_thoughts: List[ExtraThought] = []
 
     def format_extra_thoughts(self) -> str:
         if len(self.extra_thoughts) == 0:
             return ""
         return "\n\t".join([
-            f"{name}: {type_hint} [{description}]" for name, type_hint, description in self.extra_thoughts]) + "\n\t"
+            f'"{thought.name}": string [{thought.description}]' for thought in self.extra_thoughts]) + "\n\t"
 
     def get_format_instructions(self) -> str:
         extra_thoughts_string = self.format_extra_thoughts()
