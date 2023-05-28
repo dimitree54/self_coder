@@ -1,4 +1,3 @@
-import re
 from enum import Enum
 from typing import List
 
@@ -6,25 +5,10 @@ from langchain.tools import BaseTool
 from pydantic import BaseModel
 
 
-def extract_code(input_string):
-    # Detect code blocks
-    pattern = r'```(?:python)?\s(.*?)```'
-    match = re.search(pattern, input_string, re.DOTALL)
-
-    if match:
-        # Found code block
-        code = match.group(1)
-    else:
-        # No code block, assume pure code
-        code = input_string
-
-    return code
-
-
 class ToolType(Enum):
-    RETURNING = "returning"
-    FINAL = "final"
-    DELEGATE = "delegate"
+    RETURNING = "returning"  # simple tool, returning its output back to agent
+    FINAL = "final"  # tool, replacing FinalAnswer of agent. Input of that tool will be returned as output of agent
+    DELEGATE = "delegate"  # tool, which is not expected to return answer back to agent
 
 
 class SmartTool(BaseModel):
