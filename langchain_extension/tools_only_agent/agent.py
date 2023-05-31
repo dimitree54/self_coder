@@ -59,6 +59,12 @@ class Agent(BaseModel):
         else:
             return result["output"]
 
+    def add_tool(self, tool: SmartTool):
+        self.tools.append(tool)
+
+    def remove_tool(self, tool_name: str):
+        self.tools = [tool for tool in self.tools if tool.tool.name != tool_name]
+
     @staticmethod
     def _format_prompt(prompt: PromptTemplate, **kwargs) -> str:
         relevant_args = {key: value for key, value in kwargs.items() if key in prompt.input_variables}
