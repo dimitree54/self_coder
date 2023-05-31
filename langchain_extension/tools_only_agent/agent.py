@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Union
 
 from langchain import PromptTemplate
 from langchain.agents import initialize_agent, AgentType
@@ -14,7 +14,7 @@ from langchain_extension.tools_only_agent.prompt import TEMPLATE_TOOL_RESPONSE, 
 
 class Agent(BaseModel):
     llm: ChatOpenAI
-    system_message: PromptTemplate
+    system_message: Union[PromptTemplate, str]
     extra_thoughts: List[ExtraThought] = []
     tools: List[SmartTool] = []
     verbose: bool = False
@@ -32,6 +32,10 @@ class Agent(BaseModel):
                 tool_names=format_tool_names(tools)
             )
         )
+        if isinstance(self.system_message, str):
+            system_message = PromptTemplate.from_template(self.system_message)
+        else:
+            system_message = self.system_message
         agent = initialize_agent(
             tools=tools,
             llm=self.llm,
@@ -39,7 +43,7 @@ class Agent(BaseModel):
             agent=AgentType.CHAT_CONVERSATIONAL_REACT_DESCRIPTION,
             max_iterations=1,
             agent_kwargs={
-                "system_message": self._format_prompt(self.system_message, **kwargs) + tools_and_format_instructions,
+                "system_message": self._format_prompt(system_message, **kwargs) + tools_and_format_instructions,
                 "human_message": SUFFIX,
                 "template_tool_response": TEMPLATE_TOOL_RESPONSE,
                 "output_parser": output_parser
