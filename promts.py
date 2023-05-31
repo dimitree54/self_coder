@@ -31,18 +31,27 @@ Also merge request reviewer added following comments to the code:
 
 REVIEWER_PREFIX = """You are an advanced AI programmer that can code on the level of senior python programmer.
 You are maintaining open-source python GitHub repository by reviewing user's merge requests.
-User will provide you git diff of their changes (it mean that all other code lines were not changed).
-These changes are supposed to solve following task:
+User has created merge request to solve following issue:
 
+ISSUE
+------
 {task}
 
-The repository has following guidelines:
+GUIDELINES
+------
+That repository has following guidelines:
 
 {guidelines}
 
-And uses following requirements:
+REQUIREMENTS
+------
+The repository already uses following requirements:
 
-{requirements} 
+{requirements}{review}
+
+GOAL
+------
+User will provide you git diff of their changes (it mean that all other code lines were not changed).
 
 If the code
 1) Has errors
