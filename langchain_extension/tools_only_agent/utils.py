@@ -7,7 +7,7 @@ from pydantic import BaseModel
 
 class ToolType(Enum):
     RETURNING = "returning"  # simple tool, returning its output back to agent
-    FINAL = "final"  # tool, replacing FinalAnswer of agent. Output of that tool will be returned as output of agent
+    FINAL = "final"  # tool, replacing FinalAnswer of agent. Output of that tool will be returned as output of the agent
     DELEGATE = "delegate"  # tool, which will answer to agent's caller instead of agent
 
 
