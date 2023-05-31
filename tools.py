@@ -1,4 +1,5 @@
 from langchain_extension.tools_only_agent.utils import FinalAnswerTool
+from utils import extract_code
 
 
 class SendToReviewTool(FinalAnswerTool):
@@ -7,6 +8,9 @@ class SendToReviewTool(FinalAnswerTool):
                        "The input of that tool is your updated code without any additional text. " \
                        "Code should include whole updated file, including not changed lines. " \
                        "The code have to be executable, so do not include any non-code text."
+
+    def _run(self, tool_input: str) -> str:
+        return extract_code(tool_input)
 
 
 class ReviewTool(FinalAnswerTool):
@@ -17,9 +21,11 @@ class ReviewTool(FinalAnswerTool):
 
 
 class ApproveTool(FinalAnswerTool):
-    name: str = "Approve"
+    name: str = "approve"
     description: str = "If you are satisfied with code, use that tool to approve it. " \
                        "The input of that tool is your comments about code."
     return_direct: bool = True
+    approve_value: str = "approved"
 
-
+    def _run(self, tool_input: str) -> str:
+        return self.approve_value

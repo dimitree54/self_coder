@@ -41,12 +41,10 @@ def review_code(llm: ChatOpenAI, code_diff: str, issue_info: IssueInfo) -> Optio
         requirements=issue_info.requirements
     )
 
-    if reviewer_output["tool_name"] == review_tool.name:
-        return reviewer_output["output"]
-    elif reviewer_output["tool_name"] == approve_tool.name:
+    if reviewer_output == approve_tool.approve_value:
         return None
     else:
-        raise Exception("Unexpected reviewer output")
+        return reviewer_output
 
 
 def get_diff(code_before: str, code_after: str) -> str:

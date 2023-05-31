@@ -1,4 +1,4 @@
-from typing import List, Any
+from typing import List
 
 from langchain import PromptTemplate
 from langchain.agents import initialize_agent, AgentType
@@ -19,7 +19,7 @@ class Agent(BaseModel):
     tools: List[SmartTool] = []
     verbose: bool = False
 
-    def call(self, **kwargs) -> dict[str, Any]:
+    def call(self, **kwargs) -> str:
         # we initialize new agent every call to support dynamically changing tools
         output_parser = ToolsOnlyOutputParser(
             final_tools=set([tool.tool.name for tool in self.tools if tool.tool_type == ToolType.FINAL]),
@@ -45,7 +45,15 @@ class Agent(BaseModel):
                 "output_parser": output_parser
             }
         )
-        return agent(kwargs)
+        result = agent(kwargs)
+        if isinstance(result, str):
+            return result
+        if "tool_name" in result:
+            tool = agent.lookup_tool(result["tool_name"])
+            tool_output = tool(result["output"])
+            return tool_output
+        else:
+            return result["output"]
 
     @staticmethod
     def _format_prompt(prompt: PromptTemplate, **kwargs) -> str:

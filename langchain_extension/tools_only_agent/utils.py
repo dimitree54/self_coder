@@ -7,8 +7,8 @@ from pydantic import BaseModel
 
 class ToolType(Enum):
     RETURNING = "returning"  # simple tool, returning its output back to agent
-    FINAL = "final"  # tool, replacing FinalAnswer of agent. Input of that tool will be returned as output of agent
-    DELEGATE = "delegate"  # tool, which is not expected to return answer back to agent
+    FINAL = "final"  # tool, replacing FinalAnswer of agent. Output of that tool will be returned as output of agent
+    DELEGATE = "delegate"  # tool, which will answer to agent's caller instead of agent
 
 
 class SmartTool(BaseModel):
@@ -29,10 +29,10 @@ class FinalAnswerTool(BaseTool):
     """Tool for direct returning its arguments from agent (use it as final_tool in ToolsOnlyOutputParser)"""
 
     def _run(self, tool_input: str) -> str:
-        raise RuntimeError("That tool supposed to be final. Add it as final_tool in ToolsOnlyOutputParser.")
+        return tool_input
 
     async def _arun(self, tool_input: str) -> str:
-        raise RuntimeError("That tool supposed to be final. Add it as final_tool in ToolsOnlyOutputParser.")
+        return self._run(tool_input)
 
 
 def format_tools_description(tools: List[BaseTool]) -> str:

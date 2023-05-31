@@ -34,4 +34,4 @@ def improve_code(llm: ChatOpenAI, code_to_improve: str, issue_info: IssueInfo, r
         chat_history=[],
         task=issue_info.task, guidelines=issue_info.guidelines,
         requirements=issue_info.requirements, review=review
-    )["output"]
+    )
