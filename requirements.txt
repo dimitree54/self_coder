@@ -1,2 +1,3 @@
 python-dotenv
 langchain
+yid-langchain-extensions==0.4.15

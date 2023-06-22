@@ -2,10 +2,10 @@ from pathlib import Path
 
 from dotenv import load_dotenv
 from langchain import PromptTemplate
-from langchain.agents import initialize_agent, load_tools, AgentType
+from langchain.agents import initialize_agent, AgentType
 from langchain.chat_models import ChatOpenAI
+from yid_langchain_extensions.output_parser.action_parser import ActionParser
 
-from langchain_extension.tools_only_agent_with_thoughts.output_parser import ToolsOnlyWithThoughtsOutputParser
 from promts import CODER_PREFIX, REVIEWER_PREFIX, REVIEW
 from tools import SendToReviewTool, ReviewTool, ApproveTool
 
@@ -26,7 +26,7 @@ def update_code(code: str, task: str, guidelines: str, requirements: str, max_re
             task=task, guidelines=guidelines, requirements=requirements, review=review).to_string()
         reviewer_instructions = PromptTemplate.from_template(REVIEWER_PREFIX).format_prompt(
             task=task, guidelines=guidelines, requirements=requirements).to_string()
-
+        output_parser = ActionParser()
         code_to_improve = initialize_agent(
             tools=[send_to_review_tool],  # + load_tools(["requests_get"])
             llm=llm,
@@ -35,7 +35,8 @@ def update_code(code: str, task: str, guidelines: str, requirements: str, max_re
             max_iterations=3,
             agent_kwargs={
                 "system_message": coder_instructions,
-                "output_parser": ToolsOnlyWithThoughtsOutputParser(final_tools={send_to_review_tool.name})}
+                "output_parser": output_parser
+            }
         )(dict(input=code_to_improve, chat_history=[]))["output"]
 
         reviewer_output = initialize_agent(
@@ -45,7 +46,8 @@ def update_code(code: str, task: str, guidelines: str, requirements: str, max_re
             agent=AgentType.CHAT_CONVERSATIONAL_REACT_DESCRIPTION,
             agent_kwargs={
                 "system_message": reviewer_instructions,
-                "output_parser": ToolsOnlyWithThoughtsOutputParser(final_tools={review_tool.name, approve_tool.name})}
+                "output_parser": output_parser
+            }
         )(dict(input=code_to_improve, chat_history=[]))
         if reviewer_output["tool_name"] == review_tool.name:
             review = reviewer_output["output"]
